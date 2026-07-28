@@ -1,40 +1,99 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 
 app = FastAPI()
 
-tasks = []
+tasks = [
+    {"id": 1, "title": "Learn FastAPI", "done": False},
+    {"id": 2, "title": "Build CRUD API", "done": False},
+    {"id": 3, "title": "Push to GitHub", "done": False},
+]
+
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to My To-Do API!"}
+    return {
+        "name": "Task API",
+        "version": "1.0",
+        "endpoints": [
+            "/tasks",
+            "/health"
+        ]
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 
 @app.get("/tasks")
 def get_tasks():
     return tasks
 
-@app.post("/tasks")
+
+@app.get("/tasks/{task_id}")
+def get_task(task_id: int):
+    for task in tasks:
+        if task["id"] == task_id:
+            return task
+
+    raise HTTPException(
+        status_code=404,
+        detail=f"Task {task_id} not found"
+    )
+
+
+@app.post("/tasks", status_code=status.HTTP_201_CREATED)
 def create_task(task: dict):
-    tasks.append(task)
-    return {
-        "message": "Task added successfully!",
-        "task": task
+
+    if "title" not in task or task["title"].strip() == "":
+        raise HTTPException(
+            status_code=400,
+            detail="Title is required"
+        )
+
+    new_task = {
+        "id": len(tasks) + 1,
+        "title": task["title"],
+        "done": False
     }
+
+    tasks.append(new_task)
+
+    return new_task
+
+
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, updated_task: dict):
-    for task in tasks:
-        if task["id"] == task_id:
-            task["title"] = updated_task["title"]
-            return {
-                "message": "Task updated successfully!",
-                "task": task
-            }
 
-    return {"message": "Task not found!"}
-@app.delete("/tasks/{task_id}")
-def delete_task(task_id: int):
     for task in tasks:
+
+        if task["id"] == task_id:
+
+            if "title" in updated_task:
+                task["title"] = updated_task["title"]
+
+            if "done" in updated_task:
+                task["done"] = updated_task["done"]
+
+            return task
+
+    raise HTTPException(
+        status_code=404,
+        detail=f"Task {task_id} not found"
+    )
+
+
+@app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(task_id: int):
+
+    for task in tasks:
+
         if task["id"] == task_id:
             tasks.remove(task)
-            return {"message": "Task deleted successfully!"}
+            return
 
-    return {"message": "Task not found!"}
+    raise HTTPException(
+        status_code=404,
+        detail=f"Task {task_id} not found"
+    )
