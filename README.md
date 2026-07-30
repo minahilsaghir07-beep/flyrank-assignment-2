@@ -1,16 +1,29 @@
-# FlyRank Assignment 2 – Task API
+# FlyRank Assignment 3 – Task API with SQLite
 
 ## Project Description
 
-This project is a simple CRUD (Create, Read, Update, Delete) API built using FastAPI. The API manages a to-do list using in-memory storage.
+This project is a CRUD (Create, Read, Update, Delete) API built using FastAPI and SQLite. Unlike the previous assignment, tasks are stored in a SQLite database, so the data remains available even after restarting the server.
 
 ## Technologies Used
 
 - Python
 - FastAPI
+- SQLite (sqlite3)
 - Uvicorn
 - Git
 - GitHub
+
+## Why SQLite?
+
+SQLite was chosen because it is lightweight, requires no separate server, stores data in a single database file, and is easy to use for small backend applications.
+
+## Database Location
+
+The database file is stored in the project folder as:
+
+```
+tasks.db
+```
 
 ## Installation
 
@@ -26,7 +39,7 @@ pip install fastapi uvicorn
 uvicorn main:app --reload
 ```
 
-Open your browser and visit:
+Open Swagger UI:
 
 ```
 http://127.0.0.1:8000/docs
@@ -39,23 +52,18 @@ http://127.0.0.1:8000/docs
 | GET | / | API information |
 | GET | /health | Health check |
 | GET | /tasks | Get all tasks |
-| GET | /tasks/{task_id} | Get a task by ID |
-| POST | /tasks | Create a new task |
+| GET | /tasks/{task_id} | Get one task |
+| POST | /tasks | Create a task |
 | PUT | /tasks/{task_id} | Update a task |
 | DELETE | /tasks/{task_id} | Delete a task |
 
-## Example curl Command
+## Example SQL Query
 
-```bash
-curl -i http://127.0.0.1:8000/tasks
+```sql
+SELECT * FROM tasks;
 ```
 
-## Swagger UI
+## Screenshots
 
-Open:
-
-```
-http://127.0.0.1:8000/docs
-```
-
-A screenshot of the Swagger UI is included in this repository.
+- Swagger UI screenshot
+- SQLite database viewer screenshot
