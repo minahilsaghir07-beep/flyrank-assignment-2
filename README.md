@@ -1,69 +1,59 @@
-# FlyRank Assignment 3 – Task API with SQLite
+# Task API – PostgreSQL with Docker
 
-## Project Description
+## Description
+This project is a FastAPI CRUD Task API using PostgreSQL as the database. PostgreSQL runs inside Docker, and the application connects to it using environment variables.
 
-This project is a CRUD (Create, Read, Update, Delete) API built using FastAPI and SQLite. Unlike the previous assignment, tasks are stored in a SQLite database, so the data remains available even after restarting the server.
+## Features
+- Create tasks
+- Read all tasks
+- Read a task by ID
+- Update tasks
+- Delete tasks
 
-## Technologies Used
-
+## Technologies
 - Python
 - FastAPI
-- SQLite (sqlite3)
-- Uvicorn
-- Git
-- GitHub
+- PostgreSQL
+- Docker
+- Docker Compose
+- psycopg
 
-## Why SQLite?
+## Setup
 
-SQLite was chosen because it is lightweight, requires no separate server, stores data in a single database file, and is easy to use for small backend applications.
-
-## Database Location
-
-The database file is stored in the project folder as:
-
-```
-tasks.db
-```
-
-## Installation
-
-Install the required packages:
+1. Clone the repository.
+2. Create a `.env` file using `.env.example`.
+3. Run:
 
 ```bash
-pip install fastapi uvicorn
+docker compose up
 ```
 
-## Run the Project
-
-```bash
-uvicorn main:app --reload
-```
-
-Open Swagger UI:
+4. Open:
 
 ```
 http://127.0.0.1:8000/docs
 ```
 
-## API Endpoints
+## Environment Variables
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | / | API information |
-| GET | /health | Health check |
-| GET | /tasks | Get all tasks |
-| GET | /tasks/{task_id} | Get one task |
-| POST | /tasks | Create a task |
-| PUT | /tasks/{task_id} | Update a task |
-| DELETE | /tasks/{task_id} | Delete a task |
+Example (`.env.example`):
 
-## Example SQL Query
-
-```sql
-SELECT * FROM tasks;
+```
+DATABASE_URL=postgresql://postgres:password@localhost:5432/tasks
 ```
 
-## Screenshots
+## Persistence
 
-- Swagger UI screenshot
-- SQLite database viewer screenshot
+Data persistence was verified by:
+1. Creating tasks through the API.
+2. Restarting the Docker container.
+3. Running `GET /tasks` and confirming the tasks were still present.
+
+## API Endpoints
+
+- GET `/tasks`
+- GET `/tasks/{task_id}`
+- POST `/tasks`
+- PUT `/tasks/{task_id}`
+- DELETE `/tasks/{task_id}`
+- GET `/health`

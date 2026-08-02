@@ -1,28 +1,35 @@
 from fastapi import FastAPI, HTTPException, status
-import sqlite3
+import psycopg
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
-conn = sqlite3.connect("tasks.db", check_same_thread=False)
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+conn = psycopg.connect(DATABASE_URL)
 cursor = conn.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    done INTEGER NOT NULL
+    done BOOLEAN NOT NULL
 )
 """)
+conn.commit()
 
 cursor.execute("SELECT COUNT(*) FROM tasks")
 count = cursor.fetchone()[0]
 
 if count == 0:
     cursor.executemany(
-        "INSERT INTO tasks (title, done) VALUES (?, ?)",
+    "INSERT INTO tasks (title, done) VALUES (%s, %s)",
         [
-            ("Learn FastAPI", 0),
-            ("Build CRUD API", 0),
-            ("Push to GitHub", 0),
+            ("Learn FastAPI", False),
+            ("Build CRUD API", False),
+            ("Push to GitHub", False),
         ]
     )
     conn.commit()
@@ -64,7 +71,7 @@ def get_tasks():
 @app.get("/tasks/{task_id}")
 def get_task(task_id: int):
     cursor.execute(
-        "SELECT * FROM tasks WHERE id = ?",
+        "SELECT * FROM tasks WHERE id = %s",
         (task_id,)
     )
 
@@ -93,12 +100,12 @@ def create_task(task: dict):
         )
 
     cursor.execute(
-        "INSERT INTO tasks (title, done) VALUES (?, ?)",
-        (task["title"], 0)
+        "INSERT INTO tasks (title, done) VALUES (%s, %s) RETURNING id",
+        (task["title"], False)
     )
-    conn.commit()
 
-    task_id = cursor.lastrowid
+    task_id = cursor.fetchone()[0]
+    conn.commit()
 
     return {
         "id": task_id,
@@ -106,11 +113,13 @@ def create_task(task: dict):
         "done": False
     }
 
-
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int, updated_task: dict):
 
-    cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute(
+        "SELECT * FROM tasks WHERE id = %s",
+        (task_id,)
+    )
     row = cursor.fetchone()
 
     if not row:
@@ -120,11 +129,11 @@ def update_task(task_id: int, updated_task: dict):
         )
 
     title = updated_task.get("title", row[1])
-    done = updated_task.get("done", bool(row[2]))
+    done = updated_task.get("done", row[2])
 
     cursor.execute(
-        "UPDATE tasks SET title = ?, done = ? WHERE id = ?",
-        (title, int(done), task_id)
+        "UPDATE tasks SET title = %s, done = %s WHERE id = %s",
+        (title, done, task_id)
     )
     conn.commit()
 
@@ -138,7 +147,7 @@ def update_task(task_id: int, updated_task: dict):
 @app.delete("/tasks/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: int):
 
-    cursor.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("SELECT * FROM tasks WHERE id = %s", (task_id,))
     row = cursor.fetchone()
 
     if not row:
@@ -147,7 +156,7 @@ def delete_task(task_id: int):
             detail="Task not found"
         )
 
-    cursor.execute("DELETE FROM tasks WHERE id = ?", (task_id,))
+    cursor.execute("DELETE FROM tasks WHERE id = %s", (task_id,))
     conn.commit()
 
     return
