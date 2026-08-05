@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, BackgroundTasks
 import psycopg
 import os
 from dotenv import load_dotenv
+from pdf_generator import generate_pdf_report
 
 app = FastAPI()
 load_dotenv()
@@ -160,3 +161,12 @@ def delete_task(task_id: int):
     conn.commit()
 
     return
+
+@app.post("/reports")
+def create_report(background_tasks: BackgroundTasks):
+
+    background_tasks.add_task(generate_pdf_report)
+
+    return {
+        "message": "Report generation started in the background."
+    }
