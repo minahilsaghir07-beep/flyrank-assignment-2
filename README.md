@@ -4,7 +4,7 @@
 
 This project is a **FastAPI CRUD Task API** that uses **PostgreSQL** as its database. PostgreSQL runs inside **Docker**, and the application connects using environment variables.
 
-The project also includes **PDF report generation** using **ReportLab**. Reports are generated **in the background** using FastAPI's `BackgroundTasks` and saved in the `reports/` folder.
+The project also includes **PDF report generation** using **ReportLab**. Reports are generated in the background using FastAPI's `BackgroundTasks` and saved in the `reports/` folder.
 
 ---
 
@@ -22,7 +22,7 @@ The project also includes **PDF report generation** using **ReportLab**. Reports
 
 ---
 
-## 🛠 Technologies Used
+## 🛠️ Technologies Used
 
 - Python
 - FastAPI
@@ -48,8 +48,7 @@ flyRank-assignment-2/
 ├── repository.py
 ├── docker-compose.yml
 ├── .env.example
-├── README.md
-└── requirements.txt
+└── README.md
 ```
 
 ---
@@ -59,13 +58,13 @@ flyRank-assignment-2/
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/minahilsaghir07-beep/flyRank-assignment-2.git
 cd flyRank-assignment-2
 ```
 
 ### 2. Create a `.env` file
 
-Copy `.env.example` and update the values.
+Create a `.env` file using `.env.example`.
 
 Example:
 
@@ -76,19 +75,19 @@ POSTGRES_PASSWORD=password
 POSTGRES_DB=tasks
 ```
 
-### 3. Start PostgreSQL
+### 3. Install Dependencies
+
+```bash
+pip install fastapi uvicorn psycopg python-dotenv reportlab
+```
+
+### 4. Start PostgreSQL
 
 ```bash
 docker compose up
 ```
 
-### 4. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 5. Run the application
+### 5. Run the FastAPI Application
 
 ```bash
 uvicorn main:app --reload
@@ -96,7 +95,9 @@ uvicorn main:app --reload
 
 ### 6. Open Swagger UI
 
-```
+Open your browser and visit:
+
+```text
 http://127.0.0.1:8000/docs
 ```
 
@@ -104,46 +105,40 @@ http://127.0.0.1:8000/docs
 
 ## 📚 API Endpoints
 
-### Tasks
+### Task Endpoints
 
-| Method | Endpoint |
-|--------|----------|
-| GET | `/tasks` |
-| GET | `/tasks/{task_id}` |
-| POST | `/tasks` |
-| PUT | `/tasks/{task_id}` |
-| DELETE | `/tasks/{task_id}` |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/tasks` | Get all tasks |
+| GET | `/tasks/{task_id}` | Get a task by ID |
+| POST | `/tasks` | Create a new task |
+| PUT | `/tasks/{task_id}` | Update an existing task |
+| DELETE | `/tasks/{task_id}` | Delete a task |
 
 ### Health Check
 
-| Method | Endpoint |
-|--------|----------|
-| GET | `/health` |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Check API status |
 
-### Reports
+### Report Generation
 
-| Method | Endpoint |
-|--------|----------|
-| POST | `/reports` |
-
-The `/reports` endpoint starts a **background task** that generates a PDF report and saves it in the `reports/` folder.
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/reports` | Generate a PDF report in the background |
 
 ---
 
 ## 📄 PDF Report Generation
 
-Each generated PDF report contains:
+The generated PDF report includes:
 
 - Report title
 - Date and time of generation
 - Task information
 - Task status (Done / Pending)
 
-Generated reports are stored in:
-
-```text
-reports/
-```
+Reports are automatically saved in the **`reports/`** folder.
 
 Example:
 
@@ -159,7 +154,7 @@ Data persistence was verified by:
 
 1. Creating tasks through the API.
 2. Restarting the PostgreSQL Docker container.
-3. Calling `GET /tasks`.
+3. Running `GET /tasks`.
 4. Confirming that previously created tasks remained available.
 
 ---
@@ -172,7 +167,7 @@ Data persistence was verified by:
 docker compose up
 ```
 
-2. Run the FastAPI application:
+2. Run the FastAPI server:
 
 ```bash
 uvicorn main:app --reload
@@ -180,17 +175,17 @@ uvicorn main:app --reload
 
 3. Open Swagger UI:
 
-```
+```text
 http://127.0.0.1:8000/docs
 ```
 
-4. Execute:
+4. Execute the following endpoint:
 
-```
+```text
 POST /reports
 ```
 
-5. The PDF report will be generated in the `reports/` folder.
+5. A PDF report will be generated in the `reports/` folder.
 
 ---
 
@@ -200,4 +195,6 @@ POST /reports
 
 ---
 
-**FlyRank Backend Assignment**
+## 📌 Assignment
+
+**FlyRank Backend Assignment – PostgreSQL, Docker & PDF Report Generation**
